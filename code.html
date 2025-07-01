@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Handling with Pandas & Matplotlib | Class XII IP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4e54c8;
+            --secondary: #8f94fb;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #28a745;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --danger: #dc3545;
+            --glossy-bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --glossy-bg-dark: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-bg-dark: rgba(30, 30, 40, 0.85);
+            --text-light: #f8f9fa;
+            --text-dark: #212529;
+            --shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            --shadow-dark: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            background: var(--glossy-bg);
+            color: var(--text-dark);
+            transition: all 0.5s ease;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body.dark-mode {
+            background: var(--glossy-bg-dark);
+            color: var(--text-light);
+        }
+
+        .glossy-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode .glossy-card {
+            background: var(--card-bg-dark);
+            box-shadow: var(--shadow-dark);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 30px 0;
+            border-radius: 0 0 20px 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode .header-section {
+            background: linear-gradient(135deg, #2c3e50 0%, #4a6491 100%);
+        }
+
+        .tab-content {
+            min-height: 70vh;
+        }
+
+        .vertical-tabs {
+            position: sticky;
+            top: 20px;
+        }
+
+        .nav-pills .nav-link {
+            margin-bottom: 10px;
+            border-radius: 8px;
+            padding: 12px 20px;
+            color: var(--dark);
+            font-weight: 600;
+            text-align: left;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-pills .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .dark-mode .nav-pills .nav-link {
+            color: var(--text-light);
+        }
+
+        .nav-pills .nav-link.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(78, 84, 200, 0.4);
+        }
+
+        .dark-mode .nav-pills .nav-link.active {
+            background: linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%);
+        }
+
+        .code-block {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            border-radius: 8px;
+            padding: 15px;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            margin: 15px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .dark-mode .code-block {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .term-highlight {
+            background: linear-gradient(120deg, rgba(255,255,0,0.3), rgba(255,255,0,0));
+            padding: 0 5px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #d35400;
+        }
+
+        .dark-mode .term-highlight {
+            background: linear-gradient(120deg, rgba(241,196,15,0.3), rgba(241,196,15,0));
+            color: #f1c40f;
+        }
+
+        .glossary-term {
+            cursor: pointer;
+            border-bottom: 2px dotted var(--info);
+            position: relative;
+        }
+
+        .glossary-term:hover::after {
+            content: attr(data-definition);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            z-index: 100;
+        }
+
+        .dark-mode .glossary-term:hover::after {
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--warning) 0%, var(--danger) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .dark-mode .mode-toggle {
+            background: linear-gradient(135deg, var(--info) 0%, var(--primary) 100%);
+        }
+
+        .floating-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--success) 0%, var(--primary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .dark-mode .floating-btn {
+            background: linear-gradient(135deg, var(--info) 0%, var(--secondary) 100%);
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('https://images.unsplash.com/photo-1550439062-609e1531270e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dark-mode .hero-image {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1550439062-609e1531270e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80');
+        }
+
+        .hero-image::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(78,84,200,0.3), rgba(143,148,251,0.3));
+            z-index: 1;
+        }
+
+        .dark-mode .hero-image::before {
+            background: linear-gradient(45deg, rgba(44,83,100,0.6), rgba(32,58,67,0.6));
+        }
+
+        .hero-text {
+            position: relative;
+            z-index: 2;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .glossary-box {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,240,255,0.9));
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .dark-mode .glossary-box {
+            background: linear-gradient(135deg, rgba(30,30,50,0.9), rgba(40,40,60,0.9));
+        }
+
+        .glossary-box h3 {
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .dark-mode .glossary-box h3 {
+            color: var(--info);
+            border-color: var(--info);
+        }
+
+        .glossary-item {
+            margin-bottom: 15px;
+        }
+
+        .glossary-item h5 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .dark-mode .glossary-item h5 {
+            color: var(--info);
+        }
+
+        .question-card {
+            border-left: 4px solid var(--primary);
+            padding-left: 15px;
+            margin-bottom: 25px;
+            transition: all 0.3s;
+        }
+
+        .dark-mode .question-card {
+            border-left: 4px solid var(--info);
+        }
+
+        .question-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .dark-mode .question-card:hover {
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .answer-card {
+            background: rgba(240, 248, 255, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 15px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .dark-mode .answer-card {
+            background: rgba(20, 25, 35, 0.8);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(255,255,240,0.9), rgba(255,255,200,0.9));
+            border-left: 4px solid var(--warning);
+            padding: 15px;
+            border-radius: 0 10px 10px 0;
+            margin: 20px 0;
+        }
+
+        .dark-mode .highlight-box {
+            background: linear-gradient(135deg, rgba(50,45,10,0.9), rgba(70,60,20,0.9));
+            border-left: 4px solid var(--warning);
+        }
+
+        .subject-badge {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin: 0 5px 5px 0;
+        }
+
+        footer {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 30px 0;
+            margin-top: 50px;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .dark-mode footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #4a6491 100%);
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .dark-mode .chart-container {
+            background: rgba(40, 40, 60, 0.9);
+        }
+        
+        .topic-header {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .dark-mode .topic-header {
+            background: linear-gradient(90deg, #2c3e50, #4a6491);
+        }
+        
+        .example-box {
+            background: rgba(240, 248, 255, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .dark-mode .example-box {
+            background: rgba(30, 35, 45, 0.8);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Dark/Light Mode Toggle -->
+    <button class="mode-toggle" id="modeToggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Floating Button -->
+    <button class="floating-btn" id="scrollTopBtn">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-4 fw-bold"><i class="fas fa-table me-3"></i>Pandas & Matplotlib Tutorial</h1>
+                    <p class="lead">Class XII Informatics Practices - CBSE Curriculum</p>
+                    <div class="d-flex flex-wrap mt-4">
+                        <span class="subject-badge">Pandas</span>
+                        <span class="subject-badge">DataFrames</span>
+                        <span class="subject-badge">Series</span>
+                        <span class="subject-badge">Matplotlib</span>
+                        <span class="subject-badge">Data Visualization</span>
+                        <span class="subject-badge">CSV Handling</span>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="hero-image">
+                        <div class="hero-text">
+                            <h2>Master Data Science</h2>
+                            <p>Essential skills for data manipulation and visualization</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <!-- Vertical Tabs -->
+            <div class="col-md-3">
+                <div class="glossy-card vertical-tabs">
+                    <div class="d-flex align-items-center mb-4">
+                        <i class="fas fa-book-open fa-2x me-3 text-primary"></i>
+                        <h3 class="mb-0">Topics</h3>
+                    </div>
+                    
+                    <ul class="nav nav-pills flex-column" id="practiceTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="intro-tab" data-bs-toggle="pill" data-bs-target="#intro" type="button" role="tab">
+                                <i class="fas fa-info-circle"></i> Introduction
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="series-tab" data-bs-toggle="pill" data-bs-target="#series" type="button" role="tab">
+                                <i class="fas fa-list-ol"></i> Pandas Series
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="dataframes-tab" data-bs-toggle="pill" data-bs-target="#dataframes" type="button" role="tab">
+                                <i class="fas fa-table"></i> DataFrames
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="csv-tab" data-bs-toggle="pill" data-bs-target="#csv" type="button" role="tab">
+                                <i class="fas fa-file-csv"></i> CSV Handling
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="visualization-tab" data-bs-toggle="pill" data-bs-target="#visualization" type="button" role="tab">
+                                <i class="fas fa-chart-line"></i> Data Visualization
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="glossary-tab" data-bs-toggle="pill" data-bs-target="#glossary" type="button" role="tab">
+                                <i class="fas fa-book"></i> Glossary
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="practice-tab" data-bs-toggle="pill" data-bs-target="#practice" type="button" role="tab">
+                                <i class="fas fa-laptop-code"></i> Practice
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="col-md-9">
+                <div class="tab-content" id="practiceTabsContent">
+                    <!-- Introduction Tab -->
+                    <div class="tab-pane fade show active" id="intro" role="tabpanel">
+                        <div class="glossy-card">
+                            <h2 class="mb-4"><i class="fas fa-info-circle me-3"></i>Introduction to Python Libraries</h2>
+                            
+                            <div class="topic-header">
+                                <h3>Pandas</h3>
+                            </div>
+                            <p><span class="term-highlight">Pandas</span> is a powerful open-source data analysis and manipulation library for Python. It provides data structures and operations for manipulating numerical tables and time series.</p>
+                            <p>Key features:</p>
+                            <ul>
+                                <li>Data structures: Series (1D) and DataFrame (2D)</li>
+                                <li>Data alignment and handling of missing data</li>
+                                <li>Reshaping and pivoting of datasets</li>
+                                <li>Label-based slicing, indexing, and subsetting</li>
+                                <li>Robust input/output tools for various file formats</li>
+                            </ul>
+                            
+                            <div class="topic-header">
+                                <h3>Matplotlib</h3>
+                            </div>
+                            <p><span class="term-highlight">Matplotlib</span> is a comprehensive library for creating static, animated, and interactive visualizations in Python. It produces publication-quality figures in a variety of formats.</p>
+                            <p>Key features:</p>
+                            <ul>
+                                <li>Line plots, bar charts, histograms, scatter plots, etc.</li>
+                                <li>Customization of plot styles (labels, colors, markers, etc.)</li>
+                                <li>Support for LaTeX formatted text and symbols</li>
+                                <li>Interactive features like zooming, panning, and updating</li>
+                                <li>Integration with Pandas DataFrames</li>
+                            </ul>
+                            
+                            <div class="topic-header">
+                                <h3>Data Structures in Pandas</h3>
+                            </div>
+                            <p>Pandas has two primary data structures:</p>
+                            
+                            <div class="example-box">
+                                <h5>Series</h5>
+                                <p>A one-dimensional labeled array capable of holding any data type.</p>
+                                <div class="code-block">
+                                    <pre><code>import pandas as pd
+
+# Creating a Series
+s = pd.Series([1, 3, 5, 7, 9])
+print(s)</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>DataFrame</h5>
+                                <p>A two-dimensional labeled data structure with columns that can be of different types.</p>
+                                <div class="code-block">
+                                    <pre><code># Creating a DataFrame
+data = {'Name': ['Alice', 'Bob', 'Charlie'],
+        'Age': [25, 30, 35],
+        'City': ['New York', 'Paris', 'London']}
+
+df = pd.DataFrame(data)
+print(df)</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pandas Series Tab -->
+                    <div class="tab-pane fade" id="series" role="tabpanel">
+                        <div class="glossy-card">
+                            <h2 class="mb-4"><i class="fas fa-list-ol me-3"></i>Pandas Series</h2>
+                            
+                            <div class="topic-header">
+                                <h3>Creating Series</h3>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>From ndarray</h5>
+                                <div class="code-block">
+                                    <pre><code>import numpy as np
+import pandas as pd
+
+# Create from NumPy array
+arr = np.array([10, 20, 30, 40])
+s1 = pd.Series(arr)
+print(s1)</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>From Dictionary</h5>
+                                <div class="code-block">
+                                    <pre><code># Create from dictionary
+data = {'a': 10, 'b': 20, 'c': 30}
+s2 = pd.Series(data)
+print(s2)</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>From Scalar Value</h5>
+                                <div class="code-block">
+                                    <pre><code># Create with scalar value
+s3 = pd.Series(5, index=[0, 1, 2, 3])
+print(s3)</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="topic-header">
+                                <h3>Mathematical Operations</h3>
+                            </div>
+                            <p>Series support vectorized operations:</p>
+                            <div class="code-block">
+                                <pre><code>s = pd.Series([1, 2, 3, 4, 5])
+
+# Basic operations
+print("Addition:", s + 10)
+print("Multiplication:", s * 2)
+print("Exponentiation:", s ** 2)
+
+# Operations between Series
+s2 = pd.Series([10, 20, 30, 40, 50])
+print("Series Addition:", s + s2)
+print("Series Multiplication:", s * s2)</code></pre>
+                            </div>
+                            
+                            <div class="topic-header">
+                                <h3>Head() and Tail() Functions</h3>
+                            </div>
+                            <p>These functions allow you to view the top or bottom rows of a Series:</p>
+                            <div class="code-block">
+                                <pre><code>s = pd.Series(range(1, 101))  # Series from 1 to 100
+
+# View first 5 elements
+print(s.head())
+
+# View first 10 elements
+print(s.head(10))
+
+# View last 5 elements
+print(s.tail())
+
+# View last 10 elements
+print(s.tail(10))</code></pre>
+                            </div>
+                            
+                            <div class="topic-header">
+                                <h3>Selection, Indexing and Slicing</h3>
+                            </div>
+                            <p>Accessing data in a Series:</p>
+                            <div class="code-block">
+                                <pre><code>s = pd.Series([10, 20, 30, 40, 50], index=['a', 'b', 'c', 'd', 'e'])
+
+# By index label
+print("Element at 'b':", s['b'])
+
+# By position
+print("Element at position 2:", s[2])
+
+# Slicing by index labels
+print("Elements from 'b' to 'd':\n", s['b':'d'])
+
+# Slicing by position
+print("Elements from position 1 to 3:\n", s[1:4])
+
+# Conditional selection
+print("Elements greater than 30:\n", s[s > 30])</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- DataFrames Tab -->
+                    <div class="tab-pane fade" id="dataframes" role="tabpanel">
+                        <div class="glossy-card">
+                            <h2 class="mb-4"><i class="fas fa-table me-3"></i>Pandas DataFrames</h2>
+                            
+                            <div class="topic-header">
+                                <h3>Creating DataFrames</h3>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>From Dictionary of Series</h5>
+                                <div class="code-block">
+                                    <pre><code># Create from dictionary of Series
+names = pd.Series(['Alice', 'Bob', 'Charlie'])
+ages = pd.Series([25, 30, 35])
+cities = pd.Series(['NY', 'Paris', 'London'])
+
+data = {'Name': names, 'Age': ages, 'City': cities}
+df = pd.DataFrame(data)
+print(df)</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>From List of Dictionaries</h5>
+                                <div class="code-block">
+                                    <pre><code># Create from list of dictionaries
+data = [
+    {'Name': 'Alice', 'Age': 25, 'City': 'NY'},
+    {'Name': 'Bob', 'Age': 30, 'City': 'Paris'},
+    {'Name': 'Charlie', 'Age': 35, 'City': 'London'}
+]
+
+df = pd.DataFrame(data)
+print(df)</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="topic-header">
+                                <h3>Displaying DataFrames</h3>
+                            </div>
+                            <div class="code-block">
+                                <pre><code># Display first 5 rows
+print(df.head())
+
+# Display last 3 rows
+print(df.tail(3))
+
+# Display summary information
+print(df.info())
+
+# Display descriptive statistics
+print(df.describe())</code></pre>
+                            </div>
+                            
+                            <div class="topic-header">
+                                <h3>Iteration</h3>
+                            </div>
+                            <p>Iterating through rows in a DataFrame:</p>
+                            <div class="code-block">
+                                <pre><code># Iterate through rows
+for index, row in df.iterrows():
+    print(f"Index: {index}")
+    print(f"Name: {row['Name']}, Age: {row['Age']}, City: {row['City']}")
+    print()</code></pre>
+                            </div>
+                            
+                            <div class="topic-header">
+                                <h3>Operations on Rows and Columns</h3>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>Adding Columns</h5>
+                                <div class="code-block">
+                                    <pre><code># Add new column
+df['Salary'] = [70000, 80000, 90000]
+print(df)</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>Selecting Columns</h5>
+                                <div class="code-block">
+                                    <pre><code># Select single column
+print(df['Name'])
+
+# Select multiple columns
+print(df[['Name', 'Salary']])</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>Deleting Columns</h5>
+                                <div class="code-block">
+                                    <pre><code># Delete column
+df.drop('Salary', axis=1, inplace=True)
+print(df)</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>Renaming Columns</h5>
+                                <div class="code-block">
+                                    <pre><code># Rename columns
+df.rename(columns={'Name': 'Full Name', 'City': 'Location'}, inplace=True)
+print(df)</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="topic-header">
+                                <h3>Indexing</h3>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>Label-based Indexing (loc)</h5>
+                                <div class="code-block">
+                                    <pre><code># Set index
+df.set_index('Full Name', inplace=True)
+
+# Access row by label
+print(df.loc['Alice'])
+
+# Access specific values
+print(df.loc['Bob', 'Age'])</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>Boolean Indexing</h5>
+                                <div class="code-block">
+                                    <pre><code># Filter rows based on condition
+print(df[df['Age'] > 30])
+
+# Multiple conditions
+print(df[(df['Age'] > 25) & (df['Location'] == 'Paris')])</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- CSV Handling Tab -->
+                    <div class="tab-pane fade" id="csv" role="tabpanel">
+                        <div class="glossy-card">
+                            <h2 class="mb-4"><i class="fas fa-file-csv me-3"></i>Importing/Exporting CSV Files</h2>
+                            
+                            <div class="topic-header">
+                                <h3>Reading from CSV Files</h3>
+                            </div>
+                            <div class="code-block">
+                                <pre><code># Read CSV file
+df = pd.read_csv('data.csv')
+
+# Read with specific options
+df = pd.read_csv('data.csv', 
+                 header=0,        # Use first row as headers
+                 index_col='id',   # Set 'id' column as index
+                 usecols=['id', 'name', 'age'],  # Select specific columns
+                 na_values=['NA', 'missing'])    # Treat these as NaN</code></pre>
+                            </div>
+                            
+                            <div class="topic-header">
+                                <h3>Writing to CSV Files</h3>
+                            </div>
+                            <div class="code-block">
+                                <pre><code># Write to CSV
+df.to_csv('output.csv')
+
+# Write with specific options
+df.to_csv('output.csv', 
+          index=False,        # Don't write index
+          columns=['name', 'age'],  # Write specific columns
+          na_rep='NULL')      # Represent NaN as NULL</code></pre>
+                            </div>
+                            
+                            <div class="topic-header">
+                                <h3>Data Cleaning Example</h3>
+                            </div>
+                            <div class="code-block">
+                                <pre><code># Read data
+df = pd.read_csv('student_data.csv')
+
+# Handle missing values
+df['Math'].fillna(df['Math'].mean(), inplace=True)
+df['Science'].fillna(df['Science'].median(), inplace=True)
+
+# Convert data types
+df['Grade'] = df['Grade'].astype('category')
+
+# Save cleaned data
+df.to_csv('cleaned_student_data.csv', index=False)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Visualization Tab -->
+                    <div class="tab-pane fade" id="visualization" role="tabpanel">
+                        <div class="glossy-card">
+                            <h2 class="mb-4"><i class="fas fa-chart-line me-3"></i>Data Visualization with Matplotlib</h2>
+                            
+                            <div class="topic-header">
+                                <h3>Purpose of Plotting</h3>
+                            </div>
+                            <p>Data visualization helps in:</p>
+                            <ul>
+                                <li>Understanding patterns, trends, and correlations</li>
+                                <li>Identifying outliers and anomalies</li>
+                                <li>Communicating insights effectively</li>
+                                <li>Making data-driven decisions</li>
+                                <li>Simplifying complex data relationships</li>
+                            </ul>
+                            
+                            <div class="topic-header">
+                                <h3>Line Plot</h3>
+                            </div>
+                            <div class="code-block">
+                                <pre><code>import matplotlib.pyplot as plt
+
+# Sample data
+x = [1, 2, 3, 4, 5]
+y = [2, 4, 6, 8, 10]
+
+# Create line plot
+plt.figure(figsize=(8, 5))
+plt.plot(x, y, marker='o', linestyle='-', color='b', label='Linear Growth')
+plt.title('Simple Line Plot')
+plt.xlabel('X-axis')
+plt.ylabel('Y-axis')
+plt.legend()
+plt.grid(True)
+plt.savefig('line_plot.png')  # Save the plot
+plt.show()</code></pre>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="lineChart"></canvas>
+                            </div>
+                            
+                            <div class="topic-header">
+                                <h3>Bar Graph</h3>
+                            </div>
+                            <div class="code-block">
+                                <pre><code># Sample data
+categories = ['A', 'B', 'C', 'D']
+values = [15, 25, 30, 20]
+
+# Create bar graph
+plt.figure(figsize=(8, 5))
+plt.bar(categories, values, color=['red', 'green', 'blue', 'purple'])
+plt.title('Bar Graph Example')
+plt.xlabel('Categories')
+plt.ylabel('Values')
+plt.savefig('bar_graph.png')  # Save the plot
+plt.show()</code></pre>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="barChart"></canvas>
+                            </div>
+                            
+                            <div class="topic-header">
+                                <h3>Histogram</h3>
+                            </div>
+                            <div class="code-block">
+                                <pre><code># Sample data
+data = [22, 25, 30, 35, 40, 42, 45, 50, 55, 60, 65, 70, 75, 80]
+
+# Create histogram
+plt.figure(figsize=(8, 5))
+plt.hist(data, bins=5, edgecolor='black', color='skyblue')
+plt.title('Age Distribution Histogram')
+plt.xlabel('Age')
+plt.ylabel('Frequency')
+plt.savefig('histogram.png')  # Save the plot
+plt.show()</code></pre>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="histogramChart"></canvas>
+                            </div>
+                            
+                            <div class="topic-header">
+                                <h3>Customizing Plots</h3>
+                            </div>
+                            <div class="code-block">
+                                <pre><code># Create customized plot
+plt.figure(figsize=(10, 6))
+
+# Plot data
+x = np.linspace(0, 10, 100)
+y1 = np.sin(x)
+y2 = np.cos(x)
+
+plt.plot(x, y1, label='Sine', color='blue', linestyle='-', linewidth=2)
+plt.plot(x, y2, label='Cosine', color='red', linestyle='--', linewidth=2)
+
+# Customize
+plt.title('Trigonometric Functions', fontsize=14)
+plt.xlabel('X values', fontsize=12)
+plt.ylabel('Y values', fontsize=12)
+plt.legend(fontsize=10, loc='upper right')
+plt.grid(True, linestyle=':', alpha=0.7)
+plt.xticks(fontsize=10)
+plt.yticks(fontsize=10)
+plt.savefig('custom_plot.png', dpi=300, bbox_inches='tight')  # Save with high quality
+plt.show()</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Glossary Tab -->
+                    <div class="tab-pane fade" id="glossary" role="tabpanel">
+                        <div class="glossy-card">
+                            <h2 class="mb-4"><i class="fas fa-book me-3"></i>Data Science Glossary</h2>
+                            
+                            <div class="glossary-box">
+                                <h3><i class="fas fa-graduation-cap me-2"></i>Essential Terms</h3>
+                                
+                                <div class="glossary-item">
+                                    <h5>DataFrame</h5>
+                                    <p>A 2-dimensional labeled data structure with columns of potentially different types, similar to a spreadsheet or SQL table.</p>
+                                </div>
+                                
+                                <div class="glossary-item">
+                                    <h5>Series</h5>
+                                    <p>A one-dimensional labeled array capable of holding any data type (integers, strings, floating point numbers, Python objects, etc.).</p>
+                                </div>
+                                
+                                <div class="glossary-item">
+                                    <h5>NaN (Not a Number)</h5>
+                                    <p>A special floating-point value used to represent missing or undefined data in Pandas.</p>
+                                </div>
+                                
+                                <div class="glossary-item">
+                                    <h5>Indexing</h5>
+                                    <p>The process of selecting specific rows and columns of data in a DataFrame using labels (loc) or integer positions (iloc).</p>
+                                </div>
+                                
+                                <div class="glossary-item">
+                                    <h5>Boolean Indexing</h5>
+                                    <p>A method of selecting data from a DataFrame using conditions that return boolean values (True/False).</p>
+                                </div>
+                                
+                                <div class="glossary-item">
+                                    <h5>CSV (Comma-Separated Values)</h5>
+                                    <p>A plain text file format used to store tabular data, where each line represents a data record and each record consists of fields separated by commas.</p>
+                                </div>
+                                
+                                <div class="glossary-item">
+                                    <h5>Matplotlib</h5>
+                                    <p>A comprehensive library for creating static, animated, and interactive visualizations in Python.</p>
+                                </div>
+                                
+                                <div class="glossary-item">
+                                    <h5>Histogram</h5>
+                                    <p>A graphical representation of the distribution of numerical data, where the data is divided into bins and the count of observations in each bin is shown.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Practice Tab -->
+                    <div class="tab-pane fade" id="practice" role="tabpanel">
+                        <div class="glossy-card">
+                            <h2 class="mb-4"><i class="fas fa-laptop-code me-3"></i>Practice Questions</h2>
+                            
+                            <div class="question-card">
+                                <h4>Pandas Series</h4>
+                                <p>Create a Pandas Series from the following dictionary and perform the following operations:</p>
+                                <pre>data = {'Jan': 150, 'Feb': 200, 'Mar': 175, 'Apr': 225, 'May': 250}</pre>
+                                <ul>
+                                    <li>Calculate the average sales</li>
+                                    <li>Find the month with maximum sales</li>
+                                    <li>Increase all sales values by 10%</li>
+                                    <li>Extract sales from February to April</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="question-card">
+                                <h4>DataFrames</h4>
+                                <p>Given the following DataFrame:</p>
+                                <pre>   Name  Age  Salary
+0  Alice   25   50000
+1    Bob   30   60000
+2  Carol   35   70000</pre>
+                                <ul>
+                                    <li>Add a new column 'Bonus' that is 10% of Salary</li>
+                                    <li>Rename the 'Age' column to 'Years'</li>
+                                    <li>Select only the rows where Salary > 55000</li>
+                                    <li>Delete the 'Age' column</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="question-card">
+                                <h4>CSV Handling</h4>
+                                <p>You have a CSV file 'students.csv' with the following columns: ID, Name, Math, Science, English.</p>
+                                <ul>
+                                    <li>Read the CSV file into a DataFrame</li>
+                                    <li>Calculate the average score for each student and add it as a new column</li>
+                                    <li>Replace any missing values with the subject average</li>
+                                    <li>Save the modified DataFrame to a new CSV file 'students_updated.csv'</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="question-card">
+                                <h4>Data Visualization</h4>
+                                <p>Given the following data:</p>
+                                <pre>Months = ['Jan', 'Feb', 'Mar', 'Apr', 'May']
+Sales = [120, 150, 180, 135, 200]</pre>
+                                <ul>
+                                    <li>Create a line plot showing sales over months</li>
+                                    <li>Create a bar chart of the same data</li>
+                                    <li>Add appropriate titles, labels, and legends to both plots</li>
+                                    <li>Save both plots as image files</li>
+                                </ul>
+                            </div>
+
+                            <div class="question-card">
+                                <h4>Explain `iloc` Statements</h4>
+                                <p>Explain what the following statements are doing? <code>df</code> is the name of the dataframe.</p>
+                                <div class="answer-card">
+                                    <h5>a) <code>df.iloc[:5,]</code></h5>
+                                    <p>This selects the first 5 rows (from the beginning up to, but not including, index 5) and all columns of the DataFrame <code>df</code>. The <code>iloc</code> attribute stands for “integer location” and is used to access a DataFrame using integer positions. The trailing comma is optional.</p>
+                            
+                                    <h5>b) <code>df.iloc[1:5]</code></h5>
+                                    <p>This retrieves rows with integer positions from 1 up to, but not including, 5. This means it selects rows at index 1, 2, 3, and 4. All columns for these rows are returned.</p>
+                            
+                                    <h5>c) <code>df.iloc[5,0]</code></h5>
+                                    <p>This selects the specific value at the 6th row (index 5) and the 1st column (index 0) of the DataFrame. It returns a single scalar value.</p>
+                                    <div class="highlight-box">
+                                        <strong>Note:</strong> A slice like <code>df.iloc[5:0]</code> would result in an empty slice, as the start index (5) is greater than the stop index (0).
+                                    </div>
+                            
+                                    <h5>d) <code>df.iloc[1:5,0]</code></h5>
+                                    <p>This selects rows from index 1 to 4 (<code>1:5</code>) and only the first column (index 0). It returns a Pandas Series containing the values from the first column for the specified rows.</p>
+                            
+                                    <h5>e) <code>df.iloc[1:5,:5]</code></h5>
+                                    <p>This selects a subset of the DataFrame. It gets rows from index 1 to 4 (<code>1:5</code>) and columns from index 0 to 4 (<code>:5</code>).</p>
+                            
+                                    <h5>f) <code>df.iloc[2:7,1:3]</code></h5>
+                                    <p>This selects rows from index 2 to 6 (<code>2:7</code>) and columns from index 1 to 2 (<code>1:3</code>). It returns a new DataFrame that is a slice of the original.</p>
+                                </div>
+                            </div>
+
+                            <div class="question-card">
+                                <h4><code>.loc</code> vs <code>.iloc</code> Slicing</h4>
+                                <p>Trying to extract the first five rows of DataFrame <code>x</code>, Aman has given code as: <code>x.loc[0:5]</code>. But it is returning 6 rows. Why? Suggest the solution.</p>
+                                <div class="answer-card">
+                                    <p><strong>Reason:</strong> The <code>.loc</code> indexer is label-based, and when slicing with labels (even if they are default integer labels), it includes both the start and the end index. So, <code>x.loc[0:5]</code> selects all rows from label 0 to label 5, inclusive, which results in 6 rows (0, 1, 2, 3, 4, 5).</p>
+                                    <p><strong>Solution:</strong> To get the first 5 rows, you can use one of the following methods:</p>
+                                    <ul>
+                                        <li><strong>Using <code>.loc</code> with the correct end label:</strong> <code>x.loc[0:4]</code> (This will select rows with labels 0 through 4).</li>
+                                        <li><strong>Using <code>.iloc</code> for integer-position slicing:</strong> <code>x.iloc[0:5]</code> (<code>.iloc</code> is exclusive of the end index, so it will select rows at positions 0, 1, 2, 3, and 4).</li>
+                                        <li><strong>Using the <code>.head()</code> method:</strong> <code>x.head(5)</code> (This is often the most readable way to get the first n rows).</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="question-card">
+                                <h4>DataFrame Operations</h4>
+                                <p>Given a DataFrame namely “employee” that stores the details of employees. First, let's create and view the DataFrame.</p>
+                                <div class="code-block">
+                            <pre><code>import pandas as pd
+data = {'Name': ['Aman', 'Riya', 'Darpan', 'Sonia', 'Karan'],
+        'Designation': ['Manager', 'Analyst', 'Sr. Analyst', 'Developer', 'HR'],
+        'Salary': [120000, 85000, 95000, 90000, 75000],
+        'Bonus': [15000, 8000, 10000, 9500, 7000]}
+employee = pd.DataFrame(data, index=['E101', 'E102', 'E103', 'E104', 'E105'])
+print(employee)
+# Output:
+#          Name  Designation  Salary  Bonus
+# E101    Aman      Manager  120000  15000
+# E102    Riya      Analyst   85000   8000
+# E103  Darpan  Sr. Analyst   95000  10000
+# E104   Sonia    Developer   90000   9500
+# E105   Karan           HR   75000   7000</code></pre>
+                                </div>
+                                <p>Now, write statements to perform the following tasks:</p>
+                            
+                                <div class="answer-card">
+                                    <h5>a) Write a statement to display Name, Designation and Salary columns.</h5>
+                                    <div class="code-block"><pre><code>print(employee[['Name', 'Designation', 'Salary']])</code></pre></div>
+                            
+                                    <h5>b) Write a statement to display Name and Salary columns.</h5>
+                                    <div class="code-block"><pre><code>print(employee[['Name', 'Salary']])</code></pre></div>
+                            
+                                    <h5>c) Write a statement to display Bonus column only.</h5>
+                                    <div class="code-block"><pre><code># This returns a Series
+print(employee['Bonus'])
+
+# To return a DataFrame, use double square brackets
+print(employee[['Bonus']])</code></pre></div>
+                            
+                                    <h5>d) Write a statement to display all the information from Employee ids ‘E102’ to ‘E104’ (Both are included).</h5>
+                                    <p>Since the index is label-based, we use <code>.loc</code> which is inclusive of the end label.</p>
+                                    <div class="code-block"><pre><code>print(employee.loc['E102':'E104'])</code></pre></div>
+                            
+                                    <h5>e) Write a statement to display all information of Employee id ‘E102’ and ‘E105’.</h5>
+                                    <p>We pass a list of labels to <code>.loc</code> to select non-consecutive rows.</p>
+                                    <div class="code-block"><pre><code>print(employee.loc[['E102', 'E105']])</code></pre></div>
+                            
+                                    <h5>f) Write a statement to display the employee’s name, designation and salary for those having employee ids as ‘E101’ and ‘E103’.</h5>
+                                    <div class="code-block"><pre><code>print(employee.loc[['E101', 'E103'], ['Name', 'Designation', 'Salary']])</code></pre></div>
+                            
+                                    <h5>g) Write a statement to display the employee’s name and bonus for those having employee id as ‘E101’ and ‘E103’.</h5>
+                                    <div class="code-block"><pre><code>print(employee.loc[['E101', 'E103'], ['Name', 'Bonus']])</code></pre></div>
+                            
+                                    <h5>h) Write a statement to display the Salary of Darpan.</h5>
+                                    <p>Darpan's Employee ID is 'E103'.</p>
+                                    <div class="code-block"><pre><code># Using .loc with row and column labels
+print(employee.loc['E103', 'Salary'])
+
+# Alternative using boolean indexing (if index was not set)
+# print(employee[employee['Name'] == 'Darpan']['Salary'])</code></pre></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <h4>Data Handling with Pandas & Matplotlib</h4>
+                    <p>Class XII Informatics Practices - CBSE Curriculum 2025-26</p>
+                    <p>This educational resource is exclusively for academic purposes. Developed by Dr. P.R. Banerjee</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <p>© 2025 CBSE Informatics Practices</p>
+                    <p>All rights reserved</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Dark/Light Mode Toggle
+        const modeToggle = document.getElementById('modeToggle');
+        
+        modeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                modeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                modeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        });
+        
+        // Scroll to Top Button
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollTopBtn.style.display = 'flex';
+            } else {
+                scrollTopBtn.style.display = 'none';
+            }
+        });
+        
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Create sample charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Line Chart
+            const lineCtx = document.getElementById('lineChart').getContext('2d');
+            const lineChart = new Chart(lineCtx, {
+                type: 'line',
+                data: {
+                    labels: [1, 2, 3, 4, 5],
+                    datasets: [{
+                        label: 'Linear Growth',
+                        data: [2, 4, 6, 8, 10],
+                        borderColor: '#4e54c8',
+                        backgroundColor: 'rgba(78, 84, 200, 0.1)',
+                        borderWidth: 3,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#4e54c8',
+                        pointBorderWidth: 2,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Simple Line Plot',
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'X-axis'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Y-axis'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Bar Chart
+            const barCtx = document.getElementById('barChart').getContext('2d');
+            const barChart = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['A', 'B', 'C', 'D'],
+                    datasets: [{
+                        label: 'Values',
+                        data: [15, 25, 30, 20],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(153, 102, 255, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgb(255, 99, 132)',
+                            'rgb(54, 162, 235)',
+                            'rgb(75, 192, 192)',
+                            'rgb(153, 102, 255)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Bar Graph Example',
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Categories'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Values'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Histogram Chart
+            const histCtx = document.getElementById('histogramChart').getContext('2d');
+            const histChart = new Chart(histCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['20-30', '30-40', '40-50', '50-60', '60-70'],
+                    datasets: [{
+                        label: 'Frequency',
+                        data: [2, 4, 3, 3, 2],
+                        backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                        borderColor: 'rgb(75, 192, 192)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Age Distribution Histogram',
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Age Groups'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Frequency'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
